@@ -1,0 +1,1523 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd">
+<?rfc toc="yes"?>
+<?rfc tocompact="yes"?>
+<?rfc tocdepth="3"?>
+<?rfc tocindent="yes"?>
+<?rfc symrefs="yes"?>
+<?rfc sortrefs="no"?>
+<?rfc comments="yes"?>
+<?rfc inline="yes"?>
+<?rfc compact="yes"?>
+<?rfc subcompact="no"?>
+<rfc category="std" docName="draft-cl-spring-generalized-srv6-np-02"
+     ipr="trust200902" updates="">
+  <front>
+    <title abbrev="G-SRv6">Generalized SRv6 Network Programming</title>
+
+    <author fullname="Weiqiang Cheng" initials="W." surname="Cheng">
+      <organization>China Mobile</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city/>
+
+          <region/>
+
+          <code/>
+
+          <country/>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>chengweiqiang@chinamobile.com</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Zhenbin Li" initials="Z." surname="Li">
+      <organization>Huawei Technologies</organization>
+
+      <address>
+        <postal>
+          <street>Huawei Campus, No. 156 Beiqing Rd.</street>
+
+          <city>Beijing</city>
+
+          <region/>
+
+          <code>100095</code>
+
+          <country>China</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>lizhenbin@huawei.com</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Cheng Li" initials="C." surname="Li">
+      <organization>Huawei Technologies</organization>
+
+      <address>
+        <postal>
+          <street>Huawei Campus, No. 156 Beiqing Rd.</street>
+
+          <city>Beijing</city>
+
+          <region/>
+
+          <code>100095</code>
+
+          <country>China</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>c.l@huawei.com</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Chongfeng Xie" initials="C." surname="Xie">
+      <organization>China Telecom</organization>
+
+      <address>
+        <postal>
+          <street>China Telecom Information Science&amp;Technology Innovation
+          park, Beiqijia Town,Changping District</street>
+
+          <city>Beijing</city>
+
+          <region/>
+
+          <code/>
+
+          <country>China</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>xiechf@chinatelecom.cn</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Cong Li" initials="C." surname="Li">
+      <organization>China Telecom</organization>
+
+      <address>
+        <postal>
+          <street>China Telecom Information Science&amp;Technology Innovation
+          park, Beiqijia Town,Changping District</street>
+
+          <city>Beijing</city>
+
+          <region/>
+
+          <code/>
+
+          <country>China</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>licong@chinatelecom.cn</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Hui Tian" initials="H." surname="Tian">
+      <organization>CAICT</organization>
+
+      <address>
+        <postal>
+          <street/>
+
+          <city>Beijing</city>
+
+          <region/>
+
+          <code/>
+
+          <country>China</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>tianhui@caict.ac.cn</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <author fullname="Feng Zhao" initials="F." surname="Zhao">
+      <organization>CAICT</organization>
+
+      <address>
+        <postal>
+          <street>Beijing</street>
+
+          <city/>
+
+          <region/>
+
+          <code/>
+
+          <country>China</country>
+        </postal>
+
+        <phone/>
+
+        <facsimile/>
+
+        <email>zhaofeng@caict.ac.cn</email>
+
+        <uri/>
+      </address>
+    </author>
+
+    <date day="10" month="September" year="2020"/>
+
+    <area>Routing Area</area>
+
+    <workgroup>SPRING Working Group</workgroup>
+
+    <abstract>
+      <t>As the deployment of SRv6, some new requirements are proposed, such
+      as SRv6 compression, transporting over SR-MPLS/MPLS and IPv4 domains.
+      Therefore, it is necessary to consider other types of segments or
+      sub-paths in the end-to-end SRv6 network programming.</t>
+
+      <t>This document proposes Generalized Segment Routing over IPv6 (G-SRv6)
+      Networking Programming, which supports to encode multiple types of
+      Segments in a SRH, called Generalized SRH (G-SRH). These Segments can be
+      called Generalized Segment, and the ID can be Generalized Segment
+      Identifier (G-SID), which may include an SRv6 SID(128 bits), C-SIDs,
+      MPLS labels, or IPv4 tunnel information.</t>
+
+      <t>This document also defines the mechanisms of Generalized SRv6
+      Networking Programming and the requirements of related protocol
+      extensions of control plane and data plane.</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+      <t>Segment routing (SR) <xref target="RFC8402"/> is a source routing
+      paradigm that explicitly indicates the forwarding path for packets at
+      the ingress node by inserting an ordered list of instructions, called
+      segments.</t>
+
+      <t>When segment routing is deployed on the IPv6 data plane, it is called
+      SRv6 <xref target="I-D.ietf-6man-segment-routing-header"/>. For support
+      of SR, a new routing header called Segment Routing Header (SRH), which
+      contains a list of SIDs and other information, has been defined in <xref
+      target="I-D.ietf-6man-segment-routing-header"/>. In use cases like
+      Traffic Engineering, an ordered SID List with multiple SIDs is inserted
+      into the SRH to steer packets along an explicit path.</t>
+
+      <t>As the deployment of SRv6, some new requirements are proposed, such
+      as SRv6 compression, transporting over SR-MPLS/MPLS and IPv4 domains.
+      Therefore, it is necessary to consider other types of segments or
+      sub-paths in the end-to-end SRv6 network programming.</t>
+
+      <t>This document proposes Generalized Segment Routing over IPv6 (G-SRv6)
+      Networking Programming, which supports to encode multiple types of
+      Segments in a SRH, called Generalized SRH (G-SRH). These Segments can be
+      called Generalized Segment, and the ID can be Generalized Segment
+      Identifier (G-SID), which may include an SRv6 SID(128 bits), C-SIDs,
+      MPLS labels, or IPv4 tunnel information.</t>
+
+      <t>This document also defines the mechanisms of Generalized SRv6
+      Networking Programming and the requirements of related protocol
+      extensions of control plane and data plane.</t>
+    </section>
+
+    <section title="Terminology">
+      <t>This document makes use of the terms defined in <xref
+      target="I-D.ietf-6man-segment-routing-header"/>, <xref
+      target="RFC8402"/> and <xref target="RFC8200"/>, and the reader is
+      assumed to be familiar with that terminology. This document introduces
+      the following terms:</t>
+
+      <t>SRv6 SID: The 128-bit segment identifier is introduced in <xref
+      target="I-D.ietf-spring-srv6-network-programming"/>. It is always
+      composed by locator, function and/or arguments.</t>
+
+      <t>C-SRv6: Compressed SRv6 Network Programming</t>
+
+      <t>Compressable SID: It is the 128-bit SRv6 SID which can be compressed.
+      It is composed by Common Prefix and Compressed Segment Identifier
+      (C-SID) and optional arguments.</t>
+
+      <t>Common Prefix: It is the same prefix shared by multiple Compressable
+      SIDs.</t>
+
+      <t>C-SID: Compressed Segment Identifier <xref
+      target="I-D.li-spring-compressed-srv6-np"/>. It is the remaining part of
+      Compressable SID removing Common Prefix and arguments. The recommended
+      length of C-SIDs is 32 bits.</t>
+
+      <t>C-SRH: Compressed Segment Routing Header. It is the enhanced SRH used
+      for C-SRv6.</t>
+
+      <t>G-SRv6: Generalized SRv6 Network Programming</t>
+
+      <t>G-SID: Generalized Segment Identifier.</t>
+
+      <t>G-SRH: Generalized Segment Routing Header. It is the enhanced SRH
+      used for G-SRv6.</t>
+
+      <t>Compression G-SID: It is the G-SID for encapsulating C-SIDs.</t>
+
+      <t>MPLS G-SID: It is the G-SID for encapsulating MPLS label stack
+      encapsulation information.</t>
+
+      <t>IPv4 G-SID: It is the G-SID for encapsulating IPv4 tunnel
+      information.</t>
+
+      <t>SRv6 Compression Sub-path: It is the path for crossing the SRv6
+      compression domain in the end-to-end G-SRv6 path.</t>
+
+      <t>SR-MPLS Sub-path: It is the path for crossing the SR-MPLS domain in
+      the end-to-end G-SRv6 path.</t>
+
+      <t>IPv4 Tunnel Sub-path: It is the IPv4 tunnel path for crossing the
+      IPv4 domain in the end-to-end G-SRv6 path.</t>
+
+      <section title="Requirements Language">
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+        "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+        "OPTIONAL" in this document are to be interpreted as described in BCP
+        14 <xref target="RFC2119"/> <xref target="RFC8174"/> when, and only
+        when, they appear in all capitals, as shown here.</t>
+      </section>
+    </section>
+
+    <section title="Requirements">
+      <t>This section describes the requirements of G-SRv6.</t>
+
+      <section title="Crossing C-SRv6 Domains ">
+        <t>The overhead of SIDs (16 bytes per SID) in SRH proposes challenges
+        for packet processing and payload efficiency. For addressing this
+        problem, some solutions are proposed. For example, <xref
+        target="I-D.li-spring-compressed-srv6-np"/> proposes Compressed SRv6
+        Network programming(C-SRv6).</t>
+
+        <t>In an SRv6 domain, the SIDs will be allocated from an address
+        block, called SID space. For routing within an SRv6 domain, the SIDs
+        may have the same prefix (Common Prefix). <xref
+        target="I-D.li-spring-compressed-srv6-np"/> defines a compressed SID
+        (C-SID) to carry the different part of the original SRv6 SID in the
+        SRH. The format of a compressable SRv6 SID with 32 bit C-SID is shown
+        in Figure 1. The argument part is specified by use cases, and it is
+        zero by default. It is shared by the compressable SRv6 SIDs in a
+        C-SRv6 sub-path</t>
+
+        <t><figure>
+            <artwork><![CDATA[ 
+  0         Variable Length            32 bits                128 bits
+  +--------------------------------------------------------------+
+  |             Common Prefix   |  C-SID         | Argument      |
+  +--------------------------------------------------------------+
+  |<-------- Locator ---------------->|<-FuncID->|<--Argument -->|
+                                |<--->|
+                                   | 
+                        Different part of Locator     
+  
+           Figure 1. 32 bits C-SID in Compressable SRv6 SID
+
+]]></artwork>
+          </figure></t>
+
+        <t>In C-SRv6, the common prefix can be carried by the first SID in the
+        IPv6 destination address, while only the C-SIDs of the original SIDs
+        are carried in the C-SRH. In this way, the overhead of SRv6 can be
+        reduced.</t>
+
+        <t>C-SRv6 can reduce the overhead of SRH. But the C-SRv6 requires that
+        all the SIDs of the SRv6 path to be the compressable SRv6 SID. The
+        limitation causes that it does not work in the following
+        scenarios:</t>
+
+        <t>Scenario 1-1:</t>
+
+        <t>In a single domain owing to the incremental deployment there will
+        be the scenario in which some nodes can support C-SRv6 while others
+        only support SRv6. This causes that the end-to-end SRv6 path may be
+        composed by both SRv6 SIDs and Compressable SRv6 SIDs. In this case
+        C-SRv6 cannot work and SRH has to be used for the SRv6 path.</t>
+
+        <t>For example, as illustrated in Figure 2, a packet is forwarded
+        along the path A1-&gt;A2-&gt;A3-&gt;A4-&gt;A5-&gt;A6-&gt;A7, and the
+        SRv6 SID list is [A::1:1, A::2:1, A::3:1, A::4:1, A::5:1, A6::6:1,
+        A::7:10]. All the nodes along the path support compression except A6.
+        In this case, the SID list can not be compressed due to A6 does not
+        support compression.</t>
+
+        <figure>
+          <artwork><![CDATA[
+                (A::3:1)  A3------A4  (A::4:1)
+                           |      |
+                (A::2:1)  A2      A5  (A::5:1)
+                           |      |
+   Tenant10  CE1-----A0---A1------A6---A7-----CE3  Tenant10 with
+                      (A::1:1)(A6::6:1) (A::7:10)      IPv4 20/8
+
+                                                                          
+     Figure 2. SRv6 Path with SRv6 SIDs and Compressable SIDs
+
+]]></artwork>
+        </figure>
+
+        <t>Scenario 1-2:</t>
+
+        <t>In C-SRv6, Common Prefix must be designed for the Compressable SRv6
+        SIDs. But in the scenario of crossing multiple SRv6 domains, it is
+        very difficult to design the unified Common Prefix. It can be easy to
+        design its own Common Prefix in a single domain. Thus an SRv6 path
+        crossing multiple domains may be composed by different groups of
+        Compressable SRv6 SIDs with different Common Prefixes, and they can
+        not be encoded in a single C-SRH.</t>
+
+        <t>For example, as illustrated in Figure 3, , a packet is forwarded
+        along the path A1-&gt;A2-&gt;A3-&gt;A4-&gt;B1-&gt;B2-&gt;B3-&gt;B4,
+        and the SRv6 SID list is [A::1:1, A::2:1, A::3:1, A:4:1, B::1:1,
+        B::2:1, B::3:1, B:4:1]. The Common Prefix of the sub-path
+        A1-&gt;A2-&gt;A3-&gt;A4 is A and the Common Prefix of the sub-path
+        B1-&gt;B2-&gt;B3-&gt;B4 is B. But the end-to-end SRv6 path cannot be
+        compressed in a single C-SRH.</t>
+
+        <figure>
+          <artwork><![CDATA[
+                         A2-----A3    B2-----B3
+                         |      |     |      |
+                         |      |     |      |
+                         |      |     |      |
+   Tenant10  CE1---A0----A1-----A4----B1-----B4-----B0---CE3  Tenant10 with
+                                                              IPv4 20/8
+                                                                          
+     Figure 3. SRv6 Path Crossing Multiple SRv6 Compression Domains
+
+]]></artwork>
+        </figure>
+
+        <t/>
+
+        <t>For addressing above problems, a mechanism of encoding SRv6 SIDs
+        and SRv6 C-SIDs in any order in an SRH should be provided, which does
+        not require all the nodes along the path to support SRv6
+        compression.</t>
+      </section>
+
+      <section title="Crossing SR-MPLS Domains">
+        <t>In SRv6, END.BM SID can be used for indicating an SR-MPLS Policy.
+        Therefore, when an SRv6 packet needs to travel an SR-MPLS path, the
+        associated END.BM SID should be encoded in the SID list. When the
+        packet arrives at the ingress node of the SR-MPLS path, an MPLS label
+        stack will be encapsulated to the packet according to the END.BM, and
+        the packet will be forwarded in the SR-MPLS domain based on the MPLS
+        labels.</t>
+
+        <t>End.BM hides the details of the SR-MPLS path, which brings benefits
+        on security and privacy. But it brings more network states to the
+        intermediate nodes of the SRv6 path. Also, when operators can manage
+        both the SRv6 networks and SR-MPLS networks, it can program an
+        end-to-end path under specific SLA assurance. If the existing SR-MPLS
+        path associated with END.BM can not meet the SLA requirement, then a
+        new END.BM SID should be configured and advertised among the networks.
+        This procedure increases the complexities of deploying services.</t>
+
+        <t>For example, as illustrated in Figure 4, when a packet is sent from
+        CE1 to CE3, it may choose several paths in SR-MPLS domain, which
+        provide different SLA assurance. Therefore, state of multiple SR-MPLS
+        paths should be maintained at the node A1 and A2.</t>
+
+        <t>- SR-MPLS Path 1: A1-&gt;A4-&gt;A5</t>
+
+        <t>- SR-MPLS Path 2: A1-&gt;A2-&gt;A3-&gt;A6</t>
+
+        <t>- SR-MPLS Path 3: A1-&gt;A2-&gt;A3-&gt;A6-&gt;A5</t>
+
+        <t>- SR-MPLS Path 4: A2-&gt;A3-&gt;A6</t>
+
+        <t>- SR-MPLS Path 5: A2-&gt;A1-&gt;A4-&gt;A5</t>
+
+        <t>- SR-MPLS Path 6: A2-&gt;A1-&gt;A4-&gt;A5-&gt;A6</t>
+
+        <t>There will be more states of path should be maintained when the
+        scale of SR-MPLS domain is large.</t>
+
+        <t><figure>
+            <artwork><![CDATA[
+                     B2-------A2----A3-----A6-------B3
+                     |  SRv6  |   SR-MPLS  |  SRv6  |
+                     | Domain |   Domain   | Domain |
+                     |        |            |        |
+     Tenant10  CE1---B1-------A1----A4-----A5-------B4---CE3  Tenant10 with
+                                                                  IPv4 20/8
+                                                                          
+                Figure 4. SRv6 Path Crossing SR-MPLS Domains
+]]></artwork>
+          </figure></t>
+
+        <t>In order to program SR-MPLS sub-path more flexible and reduce the
+        states on the intermediate nodes, a mechanism for encoding SRv6 SID
+        and MPLS labels should be provided. In this way, the ingress node of
+        the path can program the end-to-end path including the SRv6 sub-path
+        and the SR-MPLS sub-path, and no state of MPLS sub-path will be
+        maintained.</t>
+      </section>
+
+      <section title="Crossing IPv4 Domains">
+        <t>In some scenarios such as SD-WAN an SRv6 packet may cross an IPv4
+        domain, and the SRv6 packets will be transported by the IPv6 over IPv4
+        tunnel. Similar to SR-MPLS, there can be two options for indicating
+        the IPv4 tunnel.</t>
+
+        <t><list style="symbols">
+            <t>Option A: the IPv4 tunnel binding SID in SRH</t>
+
+            <t>Option B: the IPv4 tunnel parameters in SRH</t>
+          </list></t>
+
+        <t>For IPv4 tunnel binding SID, the ingress node of IPv4 tunnel should
+        maintain the states of this tunnel.</t>
+
+        <t>For example, as illustrated in Figure 5, when a packet is sent from
+        CE1 to CE3, it may choose several paths in the IPv4 domain. Therefore,
+        state of multiple IPv4 tunnels should be maintained at the node A1 and
+        A2.</t>
+
+        <t>- IPv4 Tunnel 1: Source Address A1, Destination Address A5</t>
+
+        <t>- IPv4 Tunnel 2: Source Address A1, Destination Address A6</t>
+
+        <t>- IPv4 Tunnel 3: Source Address A2, Destination Address A5</t>
+
+        <t>- IPv4 Tunnel 4: Source Address A2, Destination Address A6</t>
+
+        <t>There will be more states of IPv4 tunnels should be maintained when
+        the scale of the IPv4 domain is large.</t>
+
+        <t><figure>
+            <artwork><![CDATA[
+                     B2-------A2----A3-----A6-------B3
+                     |  SRv6  |    IPv4    |  SRv6  |
+                     | Domain |   Domain   | Domain |
+                     |        |            |        |
+     Tenant10  CE1---B1-------A1----A4-----A5-------B4---CE3  Tenant10 with
+                                                                IPv4 20/8
+                                                                          
+                Figure 5. SRv6 Path Crossing IPv4 Domains
+]]></artwork>
+          </figure></t>
+
+        <t>The second option can be adopted to carry the IPv4 tunnel
+        information explicitly in the SRH. At the ingress of the IPv4 tunnel,
+        an IPv4 tunnel header will be encapsulated to the packet according to
+        the IPv4 tunnel information in the SRH. In order to support encoding
+        IPv4 tunnel information in SRH, new mechanisms are required.</t>
+      </section>
+    </section>
+
+    <section title="Concept of Generalized SRv6">
+      <t>According to the requirements described above, this document proposes
+      Generalized SRv6, which supports to encode multiple types of Segment ID
+      in a single SRH for an end-to-end Generalized SRv6 path that travels
+      multiple types of networks, such as SRv6 domains, Compressed SRv6
+      domains, SR-MPLS domains and IPv4 domains.</t>
+
+      <t>In order to support G-SRv6, this document proposes some enhancements
+      of SRH. This enhanced SRH is called Generalized SRH (G-SRH). The
+      Segments encoded in a G-SRH is called General Segments and its ID is
+      called Generalized SID (G-SID). A G-SID is a 128 bits value, and it may
+      contain:</t>
+
+      <t><list style="symbols">
+          <t>an SRv6 SID</t>
+
+          <t>a compression G-SID</t>
+
+          <t>an MPLS G-SID</t>
+
+          <t>an IPv4 G-SID</t>
+        </list></t>
+
+      <section title="SRv6 G-SID">
+        <t>SRv6 SID is a type of G-SID. A G-SID contains a single SRv6 SID,
+        and does not change anything of SRv6 SID.</t>
+      </section>
+
+      <section title="Compression G-SID">
+        <t>As per <xref target="I-D.li-spring-compressed-srv6-np"/>, a C-SID
+        is a sub-set of a compressable SRv6 SID, which can be used for routing
+        the packets in compressed SRv6 network programming.</t>
+
+        <t>A compression G-SID shown in Figure 6 may contains several C-SIDs
+        and optional padding. When C-SID is a 32 bits value, a compression
+        G-SID can consist of 4 C-SIDs. If the length of C-SIDs in a G-SID is
+        less than 128 bits, then padding is required.</t>
+
+        <t><figure align="center">
+            <artwork><![CDATA[     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         C-SID 0                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         C-SID 1                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         C-SID 2                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         C-SID 3                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                (a)
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         Padding                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         Padding                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         C-SID 0                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         C-SID 1                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                (b)
+
+                     Figure 6. Compression G-SID
+]]></artwork>
+          </figure></t>
+      </section>
+
+      <section title="MPLS G-SID">
+        <t>An MPLS G-SID shown in Figure 7 may contains 4 MPLS Label
+        Encapsulations, if number of MPLS Label Encapsulations is less than 4,
+        then padding is required in G-SID for aligning with 128 bits.</t>
+
+        <t><figure align="center">
+            <artwork><![CDATA[    
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           Label 0                     |  TC |S|     TTL       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           Label 1                     |  TC |S|     TTL       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           Label 2                     |  TC |S|     TTL       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           Label 3                     |  TC |S|     TTL       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                (a)
+
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         Padding                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         Padding                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           Label 0                     |  TC |1|     TTL       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           Label 1                     |  TC |S|     TTL       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                                (b)
+
+                     Figure 7. MPLS G-SID
+
+]]></artwork>
+          </figure></t>
+
+        <t>In order to indicate the MPLS G-SID, this document proposes a END.M
+        (End function with SR-MPLS path instantiation), this will be described
+        in section 6.</t>
+
+        <t>An MPLS G-SID appears after the END.M SID, and it can not be the
+        last G-SID in the G-SID list.</t>
+      </section>
+
+      <section title="IPv4 G-SID">
+        <t>An IPv4 G-SID shown in Figure 8 contains 128 bits IPv4 tunnel
+        related information. The format of IPv4 G-SID is shown below.</t>
+
+        <t><figure align="center">
+            <artwork><![CDATA[
+     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | Type  |               Tunnel Parameters                       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       IPv4 Src Address                        |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       IPv4 Dest Address                       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       Tunnel Parameters                       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                     Figure 8. IPv4 G-SID
+]]></artwork>
+          </figure></t>
+
+        <t>In order to indicate the IPv4 G-SID, this document proposes a END.4
+        (End function with IPv4 tunnel instantiation), this will be described
+        in section 7. The detailed encoding of IPv4 tunnel G-SID is also
+        described in section 7.</t>
+
+        <t>An IPv4 G-SID appears after the End.4 SID, and it can not be the
+        last G-SID in the G-SID list.</t>
+      </section>
+    </section>
+
+    <section title="G-SRv6 for Crossing SRv6 Compression Domains">
+      <t>This section describes the mechanism of G-SRv6 for crossing SRv6
+      Compression Domains.</t>
+
+      <section title="Mechanisms">
+        <t>The path for crossing SRv6 Compression Domain is called Compressed
+        SRv6 sub-path. It should be encoded in any location of a G-SRH. There
+        are following aspects should be considered in this mechanism:</t>
+
+        <t><list style="symbols">
+            <t>Compression SID indication</t>
+
+            <t>C-SID length indication</t>
+
+            <t>Start of C-SIDs indication</t>
+
+            <t>End of C-SIDs indication</t>
+          </list></t>
+
+        <section title="Compressable SID Indication">
+          <t>A new flavor can be introduced to indicate that an SRv6 SID is
+          compressable. There are two options for the definition of the
+          flavor:</t>
+
+          <t><list style="symbols">
+              <t>Option A: If the Compressable flavor is set for a specific
+              SRv6 SID, it means that the SRv6 SID can be used as normal SRv6
+              SID and also can be used as Compressable SRv6 SID.</t>
+
+              <t>Option B: If the Compressable flavor is set for a specific
+              SRv6 SID, it means that the SRv6 SID can only be used as
+              Compressable SRv6 SID. In this option, if an SRv6 SID is already
+              allocated and the compression requirement is proposed, a new
+              SRv6 SID has to be allocated as the Compressable SRv6 SID for
+              the same function.</t>
+            </list></t>
+
+          <t>Though the Option B may use more SRv6 SIDs for the purpose of
+          compression, it has much advantages in the incremental deployment.
+          This document recommends the Option B.</t>
+        </section>
+
+        <section title="C-SID Length Indication">
+          <t>Compresable SRv6 SID can be represented as Common Prefix +
+          C-SID+(Optional) Argument. There can be multiple options for the
+          length of C-SID as follows:</t>
+
+          <t><list style="symbols">
+              <t>Option A: a variable length in bytes</t>
+
+              <t>Option B: optional length such as 16/32/64 bits</t>
+
+              <t>Option C: only one option, 32 bits</t>
+            </list></t>
+
+          <t/>
+
+          <t>Though the length of C-SID can be configured locally or
+          advertised by protocol extensions, the different length of C-SID
+          will increase the complexity of process of control plane and data
+          plane which is not necessary. This document recommends Option C
+          which is a ideal tradeoff between the compression and the enough
+          space for node ID and SRv6 Function.</t>
+        </section>
+
+        <section title="Start of Compression Indication">
+          <t>In G-SRv6, if the SID list of an SRv6 sub-path consists of a list
+          of compressable SIDs, it can be programmed as follows: the first
+          compressable SID indicates the start of C-SRv6 sub-path, followed by
+          compressable G-SIDs, which includes C-SIDs and padding if the number
+          of (32 bits) C-SIDs is less than 4 in a G-SID. The format of
+          programmed SRv6 compression sub-path is shown in Figure 9.</t>
+
+          <t><figure align="center">
+              <artwork><![CDATA[     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    .                              ...                              .
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                    Compression G-SID 1                        |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                    Compression G-SID 2                        |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                    Compressable SRv6 SID                      |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+           Figure 9. G-SID list for SRv6 Compression Path
+
+]]></artwork>
+            </figure></t>
+
+          <t/>
+        </section>
+
+        <section title="End of Compression Indication">
+          <t>Since C-SIDs and SRv6 SIDs can be encoded in any order in an SRH,
+          a mechanism for indicating the end of compression is needed. There
+          are mainly two options for the indication of the end of compression
+          as follows:<list style="symbols">
+              <t>Option A: an EOC (End of Compression) flavor is introduced
+              when advertise Compressable SRv6 SID. When the node determines
+              the IPv6 destination address of SRv6 packet is the Compresable
+              SRv6 SID with EOC flavor, meaning the associated C-SID is the
+              last C-SID in the G-SID, and it will skip the G-SID in which the
+              corresponding C-SID located and read the following 128-bit SRv6
+              SID.</t>
+
+              <t>Option B: an EOC C-SID is introduced in the G-SID to indicate
+              the end of the compression. The length of EOC C-SID is a 32 bits
+              value, and the it's value can be a well-known value such as 0 or
+              a node allocated value. If the number of C-SIDs in a Compression
+              G-SID is less than 4, the EOC can be used as the . If there are
+              4 C-SIDs in the last G-SID of Compressed SRv6 sub-path, it has
+              to insert a G-SID composed by 4 EOCs.</t>
+            </list></t>
+
+          <t>The different options for indication of end of compression are
+          shown in Figure 10.</t>
+
+          <t><figure align="center">
+              <artwork><![CDATA[
+
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                  C-SID 0 (EOC Flavor)                         |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                  C-SID 1 (Non-EOC Flavor)                     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                  C-SID 2 (Non-EOC Flavor)                     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                  C-SID 3 (Non-EOC Flavor)                     |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                         (a) Option A
+
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                                                               |
+    |                        G-SID (MBZ)                            |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         C-SID 0                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         C-SID 1                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         C-SID 2                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         C-SID 3                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                         (b) Option B
+
+             Figure 10. End of Compression Indication
+]]></artwork>
+            </figure></t>
+        </section>
+
+        <section title="Micro SID in G-SRv6 Compression">
+          <t>The Micro SID instruction is proposed at <xref
+          target="I-D.filsfils-spring-net-pgm-extension-srv6-usid"/>, and it
+          can be used for forwarding SRv6 packets by shifting the IPv6 DA. The
+          Micro SID Carrier can be seen as a type of G-SID and can be directly
+          used for G-SRv6 as shown in Figure 11 (a).</t>
+
+          <t>The compressable SRv6 SID can also be used as the Micro SID and
+          encapsulated in the Micro SID Carrier. As shown in Figure 11 (b),
+          the first compressable SRv6 SID for the sub-path crossing SRv6
+          compression domain can be changed to a Micro SID carrier with the
+          locator block and multiple uSIDs which are also C-SIDs. Therefore,
+          multiple C-SIDs can be updated to the IPv6 DA in a single time.</t>
+
+          <t>After shifting the Micro SIDs in IPv6 DA and if the last Micro
+          SID is the C-SID without EOC flavor, the following multiple C-SIDs
+          (Micro segments) in the G-SID will be updated to the IPv6 DA instead
+          of the Micro SID carrier and the location of the C-SIDs in the G-SID
+          is recorded. If the rest C-SIDs in the current G-SID is less than
+          the C-SIDs should be copied to the IPv6 DA using as the Micro SID
+          carrier in a single time, only the rest C-SIDs will be copied to the
+          IPv6 DA. The next copy will begin with the first C-SID in the next
+          G-SID. The end of the C-SIDs shifting is indicated by a EOC flavor
+          C-SID. When an EOC flavor C-SID is processed, the next 128-bits
+          G-SID will be updated to the IPv6 DA.</t>
+
+          <t><figure>
+              <artwork><![CDATA[
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           Block               |   uSID5(uN)  |   uSID6(uN)    |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           Block               |   uSID3(uN)  |   uSID4(uN)    |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           Block               |   uSID1(uN)  |   uSID2(uN)    |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                   (a)   Original Micro SID carrier in G-SRv6
+        
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |   C-SID3(uN)   |  C-SID4(uN)  |  C-SID5(uN)  |  C-SID6(uN/EOC)|
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           Block               |  C-SID1(uN)  |  C-SID2(uN)    |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |              64 bits          |    32 bits   |    32 bits     |  
+                           
+                        (b)   C-SID(uN) in G-SRv6
+            
+                 Figure 11. Micro SID using in G-SRv6 
+
+]]></artwork>
+            </figure></t>
+
+          <t>In this mechanism, more SRH overhead can be reduced but it also
+          brings limitation of address planning and extra complexities. The
+          details will be discussed in the future version.</t>
+        </section>
+      </section>
+
+      <section title="Illustration">
+        <t>According to the above mechanisms, the scenarios shown in the
+        section 3.1 can be encoded as follows:</t>
+
+        <t>Scenario 1-1:</t>
+
+        <t>Assuming that</t>
+
+        <t><list style="symbols">
+            <t>A::1:1, A::2:1, A::3:1, A::4:1, A::5:1 are the Compressable
+            SIDs.</t>
+
+            <t>A::1:2, A::2:2, A::3:2, A::4:2, A::5:2 are the Compressable
+            SIDs with EOC flavor.</t>
+          </list></t>
+
+        <t>The programmed G-SRv6 path
+        A1-&gt;A2-&gt;A3-&gt;A4-&gt;A5-&gt;A6-&gt;A7 is shown in Figure
+        12:</t>
+
+        <figure align="center">
+          <artwork><![CDATA[     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                           A::7:10                             |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                           A6::6:1                             |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            5:2                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            4:1                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            3:1                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            2:1                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                          A1::1:1                              |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+           Figure 12. G-SRv6 Path for Scenario 1-1
+
+]]></artwork>
+        </figure>
+
+        <t/>
+
+        <t>Scenario 1-2:</t>
+
+        <t>The programmed G-SRv6 path
+        A1-&gt;A2-&gt;A3-&gt;A4-&gt;B1-&gt;B2-&gt;B3-&gt;B4 is shown in Figure
+        13:</t>
+
+        <t><figure align="center">
+            <artwork><![CDATA[     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                           Padding                             |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            4:2                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            3:1                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            2:1                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            B::1:1                             |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                           Padding                             |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            4:2                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            3:1                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            2:1                                |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                           A::1:1                              |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+           Figure 13. G-SRv6 Path for Scenario 1-2
+
+]]></artwork>
+          </figure></t>
+
+        <t>In reduced mode, the SID A::1:1 can be removed from the G-SRH.</t>
+
+        <t>The mechanism of indicating the C-SIDs within the G-SID will be
+        described in the document of G-SRH.</t>
+      </section>
+
+      <section title="Effect on SRv6">
+        <t>G-SRv6 provides the flexibility of encoding SRv6 SID and SRv6 C-SID
+        in a single SRH, which supports to program an SRv6 path that consists
+        of compression capable and compression incapable nodes. In this case,
+        G-SRv6 solves the problem of SRv6 overhead with a limited effect on
+        SRv6.</t>
+
+        <t><list style="symbols">
+            <t>Independent with SRv6: G-SRv6 does not require that the SRv6
+            SID Space has the common prefix for supporting compression. A new
+            address block can be allocated for compressable SID, and the
+            common prefix of Compressable SIDs can be configured with
+            appropriate length.</t>
+
+            <t>Incremental upgrade: G-SRv6 does not require to upgrade all the
+            nodes along the path to support SRv6 compression, they can be
+            upgraded on demand to support compression.</t>
+          </list></t>
+      </section>
+
+      <section title="Protocol Extensions Requirements">
+        <t>This section describes the protocol extension requirements.</t>
+
+        <section title="Data Plane">
+          <t>REQ1-01: An SRv6 compression path can be represented as a G-SID
+          list consists of a compressable SRv6 SID and Compression G-SIDs.</t>
+
+          <t>REQ1-02: A Compression G-SID consists of at most 4 (32-bits)
+          C-SIDs, if the number of C-SID is less than 4, then padding is
+          required to align with 128 bits.</t>
+
+          <t>REQ1-03: If the first Compressable SID is copied to the IPv6 DA,
+          then the C-SIDs of the following G-SIDs should be read by the nodes
+          along the SRv6 compression sub-path and the C-SID part in IPv6 DA
+          should be replaced accordingly.</t>
+
+          <t>REQ1-04: The last C-SID in the G-SIDs for the SRv6 compression
+          sub-path should be the Compressable SRv6 SID with EOC flavor.</t>
+
+          <t>REQ1-05: When process the Compressalbe SRv6 SID with EOC flavor
+          in the IPv6 DA, the corresponding G-SID in the G-SRH should be
+          skipped and the IPv6 DA should be updated by the following SRv6 SID
+          if exists.</t>
+        </section>
+
+        <section title="Control Plane">
+          <t>REQ1-11: ISIS/OSPF/BGP-LS extensions for advertising the G-SRv6
+          for SRv6 compression capabilities</t>
+
+          <t>REQ1-12: ISIS/OSPF/BGP-LS/BGP extensions for advertising the
+          Compression flavor for Compressable SIDs.</t>
+
+          <t>REQ1-13: ISIS/OSPF/BGP-LS extensions for advertising the
+          End-of-compression(EOC) flavor for Compressable SIDs.</t>
+
+          <t>REQ1-14: ISIS/OSPF/BGP-LS/BGP extensions for advertising the
+          format of Compressable SIDs.</t>
+
+          <t>REQ1-21: BGP SRv6 Policy extensions for advertising the G-SRv6
+          for SRv6 compression capabilities.</t>
+
+          <t>REQ1-22: BGP SR Policy extensions for programming a G-SRv6 path
+          combining with Compressable SRv6 SIDs and SRv6 SIDs.</t>
+
+          <t>REQ1-31: PCEP SRv6 Policy extensions for advertising the G-SRv6
+          for SRv6 compression capabilities.</t>
+
+          <t>REQ1-32: PCEP SR Policy extension for programming a G-SRv6 path
+          combining with Compressable SRv6 SIDs and SRv6 SIDs.</t>
+
+          <t>REQ1-33: PCEP extensions for programming a G-SRv6 path combining
+          with Compressable SRv6 SIDs and SRv6 SIDs.</t>
+        </section>
+      </section>
+    </section>
+
+    <section title="G-SRv6 for Crossing SR-MPLS Domain">
+      <t>This section describes the mechanism for encoding SRv6 SIDs and MPLS
+      G-SID in a single G-SRH.</t>
+
+      <section title="Mechanisms">
+        <t>The path for crossing SR-MPLS domain is called SR-MPLS sub-path. It
+        can be encoded in any location of G-SRH. There are two aspects should
+        be considered in this mechanism:</t>
+
+        <t><list style="symbols">
+            <t>Start of MPLS G-SIDs indication</t>
+
+            <t>End of MPLS G-SIDs indication</t>
+          </list></t>
+
+        <section title="Start of MPLS G-SID Indication">
+          <t>In order to indicate the start of MPLS G-SIDs, new SRv6 SIDs
+          types should be defined. This document defines an SID function to
+          indicate the start of MPLS G-SIDs, called End.M ( End with MPLS
+          labels).</t>
+
+          <t>An SR-MPLS sub-path can be encoded in the G-SRH as follows:</t>
+
+          <t><figure align="right">
+              <artwork><![CDATA[     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+  
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    .                            ...                                .
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                        MPLS G-SID 1                           |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                        MPLS G-SID 2                           |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                        End.M SRv6 SID                         |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+             Figure 14. SR-MPLS Sub-path Encoding in G-SRH
+
+]]></artwork>
+            </figure></t>
+
+          <t>When a node processes an End.M SID, it copies the following MPLS
+          label stack encapsulation information of SR-MPLS sub-path in the
+          MPLS G-SIDs to the MPLS header, and set the IPv6 DA as the SRv6 SID
+          following the last MPLS G-SID of the SR-MPLS sub-path, and then
+          forward the packet according to the active MPLS label.</t>
+        </section>
+
+        <section title="End of MPLS G-SID Indication">
+          <t>The S-bit in the MPLS label indicates the end of the MPLS label
+          within the current MPLS G-SIDs sub-list.</t>
+
+          <t>When the ingress node of the SR-MPLS sub-path reads the MPLS
+          label stack encapsulation information until the Label with S-bit
+          set. If the S-bit is set for the label encapsulation, it will skip
+          the G-SID in which the label locates and set the IPv6 DA of the SRv6
+          packet as the SRv6 SID following the G-SID if exists.</t>
+        </section>
+      </section>
+
+      <section title="Illustration">
+        <t>According to the above mechanisms, the scenarios shown in the
+        section 3.2 can be encoded as follows:</t>
+
+        <t>Assuming that</t>
+
+        <t><list style="symbols">
+            <t>A::1:100 is the End.M SID allocated by the node A1 for crossing
+            SR-MPLS domain.</t>
+
+            <t>Label 1001, 1002, 1003, 1004, 1005 and 1006 are allocated as
+            the node segment for A1/A2/A3/A4/A5/A6.</t>
+          </list></t>
+
+        <t>The programmed G-SRv6 path
+        B1-&gt;A1-&gt;A2-&gt;A3-&gt;A6-&gt;A5-&gt;B4 is shown in Figure
+        15:</t>
+
+        <figure align="center">
+          <artwork><![CDATA[     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            B::4:1                             |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           1005                        |  TC |1|     TTL       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           1006                        |  TC |0|     TTL       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           1003                        |  TC |0|     TTL       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |           1002                        |  TC |0|     TTL       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         A::1:100 (End.M)                      |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                           B::1:1                              |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                 Figure 15. G-SRv6 Path for Sec 3.2
+
+]]></artwork>
+        </figure>
+
+        <t/>
+      </section>
+
+      <section title="Effect on SRv6">
+        <t>G-SRv6 supports to program the SRv6 SID and SR-MPLS SID/MPLS label
+        in a single G-SRH, which provides to encode the end-to-end G-SRv6 path
+        across SRv6 domains and SR-MPLS/MPLS domains explicitly at the ingress
+        node. However, it also brings complexities of network programming, so
+        this document suggests to upgrade the SR-MPLS nodes to support
+        SRv6.</t>
+      </section>
+
+      <section title="Protocol Extensions Requirements">
+        <t>This section describes the protocol extension requirements of
+        G-SRv6 for MPLS G-SID.</t>
+
+        <section title="Data Plane">
+          <t>REQ2-01: An MPLS path can be encoded in G-SRH as a series of
+          G-SIDs including a 128-bit End.M SRv6 SID and a set of MPLS
+          G-SIDs.</t>
+
+          <t>REQ2-02: An MPLS G-SID can consist of up to 4 MPLS label/SR-MPLS
+          SID, if the number of MPLS label/SR-MPLS SID is less than 4, padding
+          is required to align with 128 bits.</t>
+
+          <t>REQ2-03: An End.M SRv6 SID indicates the start of MPLS G-SID.</t>
+
+          <t>REQ2-04: The SRv6 packet can be encapsulated with an outer MPLS
+          header, and the MPLS header contains the MPLS labels carried by the
+          MPLS G-SIDs.</t>
+
+          <t>REQ2-05: When the label encapsulation with S-bit is set is read
+          by the ingress node of the SR-MPLS sub-path, the corresponding G-SID
+          should be skipped and the IPv6 DA should be updated by the following
+          SRv6 SID if exists.</t>
+        </section>
+
+        <section title="Control Plane">
+          <t>REQ2-11: ISIS/OSPF/BGP-LS extensions for advertising the G-SRv6
+          for MPLS capabilities</t>
+
+          <t>REQ2-12: ISIS/OSPF/BGP-LS extensions for advertising the End.M
+          SRv6 SID.</t>
+
+          <t>REQ2-21: BGP SR Policy extensions for advertising the G-SRv6 for
+          MPLS capabilities</t>
+
+          <t>REQ2-22: BGP SR Policy extensions for encoding G-SID list with
+          SRv6 SID and MPLS G-SID for G-SRv6 path.</t>
+
+          <t>REQ2-31: PCEP SR Policy extensions for advertising the G-SRv6 for
+          MPLS capabilities</t>
+
+          <t>REQ2-31: PCEP SR Policy extensions for encoding G-SID list with
+          SRv6 SID and MPLS G-SID for G-SRv6 path.</t>
+
+          <t>REQ2-33: PCEP extensions for encoding G-SID list with SRv6 SID
+          and MPLS G-SID for G-SRv6 path.</t>
+        </section>
+      </section>
+    </section>
+
+    <section title="G-SRv6 for Crossing IPv4 Domain">
+      <t>This section describes the mechanism of G-SRv6 for crossing IPv4
+      domain.</t>
+
+      <section title="Mechanism">
+        <t>The path for crossing IPv4 domain is called IPv4 tunnel sub-path.
+        It should be encoded in any location of G-SRH. There are two aspects
+        should be considered in this mechanism:</t>
+
+        <t><list style="symbols">
+            <t>Start of IPv4 G-SID</t>
+
+            <t>IPv4 G-SID encoding</t>
+          </list></t>
+
+        <section title="Start of IPv4 G-SID Indication">
+          <t>In order to indicate the start of IPv4 G-SIDs, new SRv6 SIDs
+          types should be defined.</t>
+
+          <t>This document defines an SID function to indicate the start of
+          IPv4 G-SIDs, called End.4( End with IPv4 tunnel).</t>
+
+          <t>When a node processes the End.4 SID, it encapsulates an outer
+          IPv4 tunnel header for the SRv6 packet based on the tunnel
+          information carried by the following IPv4 G-SID, and set the IPv6 DA
+          as the SRv6 SID following the IPv4 G-SID, and then forwards the
+          packet according to the IPv4 DA.</t>
+
+          <t>An IPv4 tunnel sub-path can be encoded in the G-SRH as
+          follows:</t>
+
+          <t><figure align="center">
+              <artwork><![CDATA[     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                          IPv4 G-SID                           |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                        SRv6 End.4 SID                         |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+
+           Figure 16. IPv4 Tunnel Sub-path Encoding in G-SRH
+
+]]></artwork>
+            </figure></t>
+
+          <t>Also, this document proposes the END.B4 (End bound to an IPv4
+          tunnel) SID. A End.B4 is bound to an IPv4 tunnel. When the node
+          receives a packet with End.B4 SID, the packet should be steered into
+          the binding IPv4 tunnel.</t>
+        </section>
+
+        <section title="IPv4 G-SID encoding">
+          <t>An IPv4 GID contains the IPv4 tunnel information including tunnel
+          type, source IPv4 address, destination IPv4 address and tunnel
+          parameters. Different types of IPv4 tunnels have specific
+          parameters:</t>
+
+          <t><list style="symbols">
+              <t>IPv4 UDP tunnel: the tunnel parameters includes source port
+              and destination port.</t>
+
+              <t>IPv4 VXLAN tunnel: the tunnel parameters includes source
+              port, destination port and VN ID.</t>
+            </list></t>
+
+          <t>The detailed encapsulation formats for different types of IPv4
+          tunnel is out of scope of the document.</t>
+        </section>
+      </section>
+
+      <section title="Illustration">
+        <t>According to the above mechanisms, the scenarios shown in the
+        section 3.3 can be encoded as follows:</t>
+
+        <t>Assuming that</t>
+
+        <t><list style="symbols">
+            <t>A::1:200 is the End.4 SID allocated by the node A1 for crossing
+            IPv4 domain.</t>
+          </list></t>
+
+        <t>The programmed G-SRv6 path B1-&gt;A1-&gt;A6-&gt;B4 is shown in
+        Figure 17:</t>
+
+        <t><figure align="center">
+            <artwork><![CDATA[     0                   1                   2                   3
+     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            B::4:1                             |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    | Type  |                Tunnel Parameters                      |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       IPv4 Src Address (A1)                   |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       IPv4 Dest Address (A6)                  |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                       Tunnel Parameters                       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                         A::1:200 (End.IP4)                    |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                           B::1:1                              |
+    |                                                               |
+    |                                                               |
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+                 Figure 17. G-SRv6 Path for Sec 3.3
+
+]]></artwork>
+          </figure></t>
+      </section>
+
+      <section title="Effect on SRv6">
+        <t>G-SRv6 provides the capabilities for encoding IPv4 tunnel
+        information and SRv6 SID within a single G-SRH, which brings benefits
+        on end-to-end network programming on scenarios of packets traveling
+        SRv6 domains and IPv4 domains. However, it also brings new
+        complexities, so this document suggests to upgrade the IPv4 nodes to
+        support IPv6 or SRv6.</t>
+      </section>
+
+      <section title="Protocol Extensions Requirements">
+        <t>This section describes the protocol extension requirements of
+        G-SRv6 for IPv4 G-SID.</t>
+
+        <section title="Data Plane">
+          <t>REQ3-01: An IPv4 tunnel can be encoded in G-SRH as series of
+          G-SIDs including a 128 bit End.4 SRv6 SID and a set of IPv4
+          G-SIDs.</t>
+
+          <t>REQ3-02: An IPv4 G-SID can consist of multiple IPv4 tunnel
+          information, such as IPv4 source address and destination address of
+          the tunnel endpoint.</t>
+
+          <t>REQ3-03: An End.4 SRv6 SID indicates the start of IPv4 G-SID.</t>
+
+          <t>REQ3-04: An End.B4 SRv6 SID indicates the IPv4 tunnel.</t>
+
+          <t>REQ3-05: The SRv6 packet can be encapsulated with an outer IPv4
+          tunnel header based on the parameters in the IPv4 G-SID.</t>
+
+          <t>REQ3-06: After the tunnel information is read by the ingress node
+          of the IPv4 tunnel sub-path, the corresponding G-SID should be
+          skipped and the IPv6 DA should be updated by the following SRv6 SID
+          if exists.</t>
+        </section>
+
+        <section title="Control Plane">
+          <t>REQ3-11: ISIS/OSPF/BGP-LS extensions for advertising the G-SRv6
+          for IPv4 capabilities</t>
+
+          <t>REQ3-12: ISIS/OSPF/BGP-LS extensions for advertising the End.4
+          SRv6 SID.</t>
+
+          <t>REQ3-13: ISIS/OSPF/BGP-LS extensions for advertising the End.B4
+          SRv6 SID.</t>
+
+          <t>REQ3-21: BGP SR Policy extensions for advertising the G-SRv6 for
+          IPv4 capabilities</t>
+
+          <t>REQ3-22: BGP SR Policy extensions for encoding G-SID list with
+          SRv6 SID and IPv4 G-SID for G-SRv6 path.</t>
+
+          <t>REQ3-31: PCEP SR Policy extensions for advertising the G-SRv6 for
+          IPv4 capabilities</t>
+
+          <t>REQ3-31: PCEP SR Policy extensions for encoding G-SID list with
+          SRv6 SID and IPv4 G-SID for G-SRv6 path.</t>
+
+          <t>REQ3-33: PCEP extensions for encoding G-SID list with SRv6 SID
+          and IPv4 G-SID for G-SRv6 path.</t>
+        </section>
+      </section>
+    </section>
+
+    <section anchor="IANA" title="IANA Considerations">
+      <t>TBD</t>
+    </section>
+
+    <section anchor="Security" title="Security Considerations">
+      <t>TBD</t>
+
+      <t/>
+    </section>
+
+    <section title="Contributors">
+      <t><figure>
+          <artwork><![CDATA[Zhibo Hu
+Huawei Technologies
+huzhibo@huawei.com
+
+Yang Xia
+Huawei Technologies
+yolanda.xia@huawei.com
+
+
+]]></artwork>
+        </figure></t>
+    </section>
+
+    <section title="Acknowledgements ">
+      <t/>
+    </section>
+  </middle>
+
+  <back>
+    <references title="Normative References">
+      <?rfc include="reference.RFC.2119"?>
+
+      <?rfc include='reference.RFC.8174'?>
+
+      <?rfc include='reference.RFC.8200'?>
+
+      <?rfc include='reference.I-D.ietf-6man-segment-routing-header'?>
+
+      <?rfc include='reference.RFC.8402'?>
+
+      <?rfc include='reference.I-D.li-spring-compressed-srv6-np'?>
+    </references>
+
+    <references title="Informative References">
+      <?rfc include='reference.I-D.ietf-spring-srv6-network-programming'?>
+
+      <?rfc include='reference.I-D.filsfils-spring-srv6-net-pgm-illustration'?>
+
+      <?rfc include='reference.I-D.tian-spring-srv6-deployment-consideration'?>
+
+      <?rfc include='reference.I-D.filsfils-spring-net-pgm-extension-srv6-usid'?>
+
+      <?rfc include='reference.I-D.lc-6man-generalized-srh'?>
+    </references>
+  </back>
+</rfc>
